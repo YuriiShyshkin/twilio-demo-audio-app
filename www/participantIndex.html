@@ -83,7 +83,6 @@
         const accessToken = document.getElementById('accessToken').value;
 
         connect(accessToken, {
-            name : twilioRoomName,
             tracks : [],
             automaticSubscription : true,
             video : { height : 720, frameRate : 24, width : 1280 },
@@ -112,6 +111,8 @@
                 });
             });
 
+			document.getElementById('twilioRoomName').innerHTML = 'Twilio Room Name: ' + twilioRoom.name;
+			
             document.getElementById('credentials').classList.add('display-none');
             document.getElementById('navigation').style.display = 'flex';
 
