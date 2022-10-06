@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chose Participant</title>
+
+    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+
+<button id="hostButton" type="button" onclick="openHostPage()">Host</button>
+<button id="participantButton" type="button" onclick="openParticipantPage()">Participant</button>
+
+<div id="contentOfHost"></div>
+<div id="contentOfParticipant"></div>
+
+<script type="text/javascript">
+
+
+    function openHostPage() {
+
+        document.getElementById('hostButton').classList.add('display-none');
+        document.getElementById('participantButton').classList.add('display-none');
+
+        $(document).ready(function(){
+
+            $('#contentOfHost').load("indexHost.html");
+
+        });
+    }
+
+    function openParticipantPage() {
+        document.getElementById('hostButton').classList.add('display-none');
+        document.getElementById('participantButton').classList.add('display-none');
+
+        $(document).ready(function(){
+
+            $('#contentOfParticipant').load("participantIndex.html");
+
+        });
+
+    }
+</script>
+</body>
+</html>

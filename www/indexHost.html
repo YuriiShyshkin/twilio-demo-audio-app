@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <title>Twilio Demo App</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://sdk.twilio.com/js/video/releases/2.24.0/twilio-video.min.js"></script>
+</head>
+<body>
+<div id="main">
+    <div id="navigation" class="display-none">
+        <div id="turnOnAudio" onclick="turnOnAudio()" style="text-align: left">
+            <i class="fa fa-play" title="Turn on audio."></i>
+        </div>
+        <div id="turnOffAudio" class="display-none" onclick="turnOffAudio()" style="text-align: left">
+            <i class="fa fa-stop" title="Turn off audio."></i>
+        </div>
+    </div></br>
+    <label id="twilioRoomName"></label>
+    <div id="remote-media"></div>
+    <div>
+        <div id="credentials">
+
+            <h1>Credentials</h1>
+
+            <label for="accessToken">Access Token:</label><br>
+            <input type="text" id="accessToken" name="Access Token"><br><br>
+
+            <input type="submit" value="Submit" onclick="connect()">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="index.js"></script>
+</body>
+</html>

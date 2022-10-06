@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <title>Twilio Demo App</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <script src="https://sdk.twilio.com/js/video/releases/2.24.0/twilio-video.min.js"></script>
+    <style>
+        #main {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #main > div {
+            flex: 1 1 100%;
+            text-align: center;
+        }
+
+        #navigation {
+            display: none
+        }
+
+        #navigation > div {
+            flex: 1;
+            margin: 5px;
+        }
+
+        i.fa {
+            display: inline-block;
+            border-radius: 50px;
+            box-shadow: 0 0 2px #888;
+            font-size: 36px;
+            width: 1.6em;
+            text-align: center;
+            line-height: 1.6em;
+        }
+
+        .display-none {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="main">
+    <div id="navigation" class="display-none">
+        <div id="turnOnAudio" onclick="turnOnAudio()" style="text-align: left">
+            <i class="fa fa-play" title="Turn on audio."></i>
+        </div>
+        <div id="turnOffAudio" class="display-none" onclick="turnOffAudio()" style="text-align: left">
+            <i class="fa fa-stop" title="Turn off audio."></i>
+        </div>
+    </div></br>
+
+    <label id="twilioRoomName"></label>
+    <div id="remote-media"></div>
+    <div>
+        <div id="credentials">
+
+            <h1>Credentials</h1>
+
+            <label for="accessToken">Access Token:</label><br>
+            <input type="text" id="accessToken" name="Access Token"><br><br>
+
+            <input type="submit" value="Submit" onclick="connect()">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let createLocalAudioTrack;
+    let twilioRoom;
+    let localAudioTrack = 'roomName';
+    const twilioRoomName = 'roomName';
+
+    function connect() {
+        const connect = Twilio.Video.connect;
+
+        const accessToken = document.getElementById('accessToken').value;
+
+        connect(accessToken, {
+            name : twilioRoomName,
+            tracks : [],
+            automaticSubscription : true,
+            video : { height : 720, frameRate : 24, width : 1280 },
+            bandwidthProfile : {
+                video : {
+                    mode : 'presentation',
+                    trackSwitchOffMode : 'detected',
+                    maxSubscriptionBitrate : 0,
+                    contentPreferencesMode: 'auto'
+                }
+            },
+            dominantSpeaker: true,
+            maxAudioBitrate : 16000,
+            preferredVideoCodecs : 'auto',
+            networkQuality : {local : 1, remote : 1}
+        }).then(room => {
+
+            console.log('Twilio JS Library Version:', Twilio.Video.version);
+            console.log('Twilio Room:', room);
+
+            twilioRoom = room;
+
+            twilioRoom.participants.forEach(participant => {
+                participant.on('trackPublished', publication => {
+                    trackPublished(publication, participant);
+                });
+            });
+
+            document.getElementById('credentials').classList.add('display-none');
+            document.getElementById('navigation').style.display = 'flex';
+
+        }).catch(error => {
+            console.log('init(), error:', error);
+        });
+
+        createLocalAudioTrack = Twilio.Video.createLocalAudioTrack;
+    }
+
+    function turnOnAudio() {
+
+        createLocalAudioTrack({
+            name : 'Microphone'
+        }).then(audioTrack => {
+            localAudioTrack = audioTrack;
+            twilioRoom.localParticipant.publishTrack(audioTrack, {priority : 'low'}).then(function(publication) {
+                console.log('The LocalAudioTrack "' + publication.trackName + '" was successfully published.');
+            }).catch(error => {
+                console.log('Audio track error:', error);
+            });
+
+            const audioNode = document.createElement("span");
+            audioNode.id = twilioRoom.localParticipant.sid + 'audio';
+
+            const audioElement = localAudioTrack.attach();
+            audioNode.appendChild(audioElement);
+
+            document.getElementById('remote-media').appendChild(audioNode);
+
+        }).catch((error) => {
+            console.log('@@@ turnOnAudio(), error:', error);
+        });
+
+        document.getElementById('turnOnAudio').classList.add('display-none');
+        document.getElementById('turnOffAudio').classList.remove('display-none');
+    }
+
+    function turnOffAudio() {
+        stopTrack(localAudioTrack);
+
+        const elementToRemove = document.getElementById(twilioRoom.localParticipant.sid + 'audio');
+        elementToRemove.remove();
+
+        document.getElementById('turnOffAudio').classList.add('display-none');
+        document.getElementById('turnOnAudio').classList.remove('display-none');
+    }
+
+    function stopTrack(track) {
+        twilioRoom.localParticipant.unpublishTrack(track);
+        track.stop();
+    }
+
+    function trackPublished(publication, participant) {
+        publication.on('subscribed', track => {
+            processSubscribedTrack(participant, track);
+        });
+    }
+
+    function processSubscribedTrack(participant, track) {
+        if (track.kind === 'audio') {
+            console.log('Audio track received.');
+            if (!document.getElementById(participant.sid)) {
+                const audioElement = track.attach();
+                audioElement.id = participant.sid + 'audio';
+
+                document.getElementById('remote-media').appendChild(audioElement);
+
+            }
+            alert('Audio track received.')
+        }
+    }
+</script>
+</body>
+</html>
