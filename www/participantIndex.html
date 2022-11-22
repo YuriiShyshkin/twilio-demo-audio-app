@@ -68,6 +68,7 @@
 
             <input type="submit" value="Submit" onclick="connect()">
         </div>
+        <button id="confirmButton" class="display-none" onclick="clickConfirmButton()">Confirm Button</button>
     </div>
 </div>
 
@@ -105,22 +106,25 @@
 
             twilioRoom = room;
 
-            twilioRoom.participants.forEach(participant => {
-                participant.on('trackPublished', publication => {
-                    trackPublished(publication, participant);
-                });
-            });
-
-			document.getElementById('twilioRoomName').innerHTML = 'Twilio Room Name: ' + twilioRoom.name;
-			
+            document.getElementById('confirmButton').classList.remove('display-none');
             document.getElementById('credentials').classList.add('display-none');
-            document.getElementById('navigation').style.display = 'flex';
 
         }).catch(error => {
             console.log('init(), error:', error);
         });
 
         createLocalAudioTrack = Twilio.Video.createLocalAudioTrack;
+    }
+
+    function clickConfirmButton() {
+        twilioRoom.participants.forEach(participant => {
+            participant.on('trackPublished', publication => {
+                trackPublished(publication, participant);
+            });
+        });
+        document.getElementById('confirmButton').classList.add('display-none');
+        document.getElementById('twilioRoomName').innerHTML = 'Twilio Room Name: ' + twilioRoom.name;
+        document.getElementById('navigation').style.display = 'flex';
     }
 
     function turnOnAudio() {
